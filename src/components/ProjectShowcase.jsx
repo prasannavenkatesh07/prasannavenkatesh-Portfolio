@@ -7,7 +7,7 @@ import {
   BrainCircuit, Target,
 } from 'lucide-react';
 import ScrambleText from './ScrambleText';
-import { useScramble } from './useScramble';
+import { useScramble } from './Usescramble';
 
 /* ─────────────────────────────────────────────────────────
    Constants 

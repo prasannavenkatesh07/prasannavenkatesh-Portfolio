@@ -1,0 +1,563 @@
+/* ─────────────────────────────────────────────────────────
+   PORTFOLIO — Global Stylesheet
+   Stack: Tailwind CSS v3 + custom CSS layer
+   Fonts: Syne (display) · DM Sans (body)
+───────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Design Tokens ───────────────────────────────── */
+:root {
+  --bg-base:        #0B0F19;
+  --bg-surface:     #111827;   /* zinc-900 equivalent on slate */
+  --bg-card:        #0F1623;
+  --bg-card-hover:  #141C2E;
+
+  --border-subtle:  rgba(255, 255, 255, 0.07);
+  --border-default: rgba(255, 255, 255, 0.11);
+  --border-accent:  rgba(99, 179, 237, 0.35);   /* blue accent border */
+
+  --text-primary:   #F0F4FF;   /* near-white with a cool tint */
+  --text-secondary: rgba(200, 214, 240, 0.72);
+  --text-muted:     rgba(160, 180, 218, 0.45);
+
+  --accent-blue:    #38BDF8;   /* sky-400 — crisp electric */
+  --accent-teal:    #2DD4BF;   /* teal-400 */
+  --accent-purple:  #A78BFA;   /* violet-400 */
+  --accent-glow:    rgba(56, 189, 248, 0.18);
+
+  --font-display:   'Syne', sans-serif;
+  --font-body:      'DM Sans', sans-serif;
+
+  --radius-card:    18px;
+  --radius-btn:     12px;
+}
+
+/* ── Base resets ─────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Particle canvas — always behind content ── */
+canvas {
+  display: block;
+  pointer-events: none;   /* default; Hero overrides for mouse tracking */
+}
+
+/* Hero canvas specifically receives pointer events for mouse pull */
+section#home canvas {
+  pointer-events: auto;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  /* Grain texture overlay */
+  position: relative;
+}
+
+/* Global grain overlay — sits above everything at near-zero opacity */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* ── Scrollbar ───────────────────────────────────────── */
+::-webkit-scrollbar               { width: 5px; }
+::-webkit-scrollbar-track         { background: var(--bg-base); }
+::-webkit-scrollbar-thumb         { background: rgba(56,189,248,0.25); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover   { background: rgba(56,189,248,0.45); }
+
+/* ── Selection ───────────────────────────────────────── */
+::selection {
+  background: rgba(56, 189, 248, 0.22);
+  color: var(--accent-blue);
+}
+
+/* ── Textarea / input placeholder ───────────────────── */
+::placeholder                { color: rgba(160, 180, 218, 0.3); }
+textarea:focus, input:focus  { outline: none; }
+
+/* ═══════════════════════════════════════════════════════
+   AURORA BACKGROUND ORBS
+   Three slowly drifting radial blobs; used as a fixed
+   layer beneath all page content.
+═══════════════════════════════════════════════════════ */
+.aurora-container {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.aurora-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  will-change: transform, opacity;
+}
+
+/* Orb 1 — electric blue, top-left */
+.aurora-orb-1 {
+  width: 700px;
+  height: 700px;
+  top: -180px;
+  left: -200px;
+  background: radial-gradient(ellipse at center,
+    rgba(56, 189, 248, 0.13) 0%,
+    rgba(14, 165, 233, 0.07) 45%,
+    transparent 70%
+  );
+  animation: aurora-drift-1 22s ease-in-out infinite alternate;
+}
+
+/* Orb 2 — deep violet, center-right */
+.aurora-orb-2 {
+  width: 800px;
+  height: 600px;
+  top: 25%;
+  right: -250px;
+  background: radial-gradient(ellipse at center,
+    rgba(139, 92, 246, 0.11) 0%,
+    rgba(109, 40, 217, 0.06) 45%,
+    transparent 70%
+  );
+  animation: aurora-drift-2 28s ease-in-out infinite alternate;
+}
+
+/* Orb 3 — teal, bottom-left */
+.aurora-orb-3 {
+  width: 600px;
+  height: 600px;
+  bottom: -100px;
+  left: 30%;
+  background: radial-gradient(ellipse at center,
+    rgba(45, 212, 191, 0.10) 0%,
+    rgba(20, 184, 166, 0.05) 45%,
+    transparent 70%
+  );
+  animation: aurora-drift-3 32s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-drift-1 {
+  0%   { transform: translate(0px,   0px)   scale(1);    opacity: 0.8; }
+  33%  { transform: translate(60px,  40px)  scale(1.08); opacity: 1;   }
+  66%  { transform: translate(30px,  80px)  scale(0.96); opacity: 0.85;}
+  100% { transform: translate(80px,  20px)  scale(1.05); opacity: 0.9; }
+}
+
+@keyframes aurora-drift-2 {
+  0%   { transform: translate(0px,   0px)   scale(1);    opacity: 0.7; }
+  33%  { transform: translate(-50px, 60px)  scale(1.1);  opacity: 0.95;}
+  66%  { transform: translate(-20px, -40px) scale(0.95); opacity: 0.75;}
+  100% { transform: translate(-70px, 30px)  scale(1.06); opacity: 0.85;}
+}
+
+@keyframes aurora-drift-3 {
+  0%   { transform: translate(0px,   0px)   scale(1);    opacity: 0.6; }
+  33%  { transform: translate(40px,  -50px) scale(1.12); opacity: 0.85;}
+  66%  { transform: translate(-30px, -20px) scale(0.98); opacity: 0.7; }
+  100% { transform: translate(20px,  -60px) scale(1.04); opacity: 0.8; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   NAME SHIMMER / LIQUID CHROME EFFECT
+   Applied to the hero name — a slow left-to-right
+   chromatic light sweep over the gradient text.
+═══════════════════════════════════════════════════════ */
+.name-shimmer {
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+
+  /* Base gradient — cool slate-white to sky-blue */
+  background: linear-gradient(
+    135deg,
+    #FFFFFF       0%,
+    #E0EEFF      20%,
+    var(--accent-blue)   38%,
+    #FFFFFF      50%,
+    var(--accent-teal)   64%,
+    #C4D9F8      80%,
+    #FFFFFF      100%
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+
+  animation: name-shimmer-flow 6s ease-in-out infinite;
+}
+
+@keyframes name-shimmer-flow {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
+}
+
+/* Optional: subtle bounce-float for the name */
+.name-float {
+  display: inline-block;
+  animation: name-float 5s ease-in-out infinite;
+}
+
+@keyframes name-float {
+  0%, 100% { transform: translateY(0px);   }
+  50%       { transform: translateY(-6px);  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   STAGGERED TEXT LINE REVEAL
+   Wrap each line in .line-mask; child animates up.
+═══════════════════════════════════════════════════════ */
+.line-mask {
+  overflow: hidden;
+  display: block;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MAGNETIC BUTTON BASE
+   JS adds transform via style; CSS handles the rest.
+═══════════════════════════════════════════════════════ */
+.btn-magnetic {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 28px;
+  border-radius: var(--radius-btn);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: box-shadow 0.3s ease, transform 0.18s cubic-bezier(.34,1.56,.64,1);
+  will-change: transform;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Primary filled variant */
+.btn-magnetic-primary {
+  background: var(--accent-blue);
+  color: #040D18;
+}
+
+.btn-magnetic-primary:hover {
+  box-shadow: 0 0 36px rgba(56, 189, 248, 0.45), 0 0 80px rgba(56, 189, 248, 0.15);
+}
+
+/* Ghost / outline variant */
+.btn-magnetic-ghost {
+  background: rgba(255,255,255,0.04);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+}
+
+.btn-magnetic-ghost:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: var(--border-accent);
+  color: var(--text-primary);
+}
+
+/* Shine sweep overlay (child element inside button) */
+.btn-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255,255,255,0.28) 50%,
+    transparent 80%
+  );
+  background-size: 300% 100%;
+  background-position: -200% 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+.btn-magnetic:hover .btn-shine {
+  opacity: 1;
+  animation: btn-shine-sweep 0.55s ease forwards;
+}
+
+@keyframes btn-shine-sweep {
+  from { background-position: -200% 0; }
+  to   { background-position:  200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   GLASSMORPHISM CARD
+   Used for the Trackwise screenshot placeholders
+═══════════════════════════════════════════════════════ */
+.glass-card {
+  background: rgba(15, 22, 35, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-card);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04) inset,
+    0 24px 48px rgba(0,0,0,0.4);
+  transition: transform 0.35s cubic-bezier(.34,1.56,.64,1),
+              box-shadow 0.35s ease,
+              border-color 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(56, 189, 248, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(56,189,248,0.08) inset,
+    0 32px 64px rgba(0,0,0,0.5),
+    0 0 40px rgba(56,189,248,0.07);
+}
+
+/* Tilt is applied via JS inline style; ensure smooth reset */
+.tilt-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SKILL / INFO CARDS — mouse spotlight
+═══════════════════════════════════════════════════════ */
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  background: rgba(15, 22, 40, 0.7);
+  border: 1px solid var(--border-subtle);
+  transition: border-color 0.25s ease;
+}
+
+.spotlight-card:hover {
+  border-color: rgba(56, 189, 248, 0.22);
+}
+
+.spotlight-card .card-spotlight {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.spotlight-card:hover .card-spotlight {
+  opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SECTION DIVIDERS
+═══════════════════════════════════════════════════════ */
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255,255,255,0.08) 20%,
+    rgba(255,255,255,0.08) 80%,
+    transparent
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   EYEBROW LABEL  (e.g. "REACH OUT", "ABOUT")
+═══════════════════════════════════════════════════════ */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-blue);
+  opacity: 0.85;
+}
+
+.eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 1px;
+  background: var(--accent-blue);
+  opacity: 0.6;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SECTION HEADINGS
+═══════════════════════════════════════════════════════ */
+.section-heading {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  letter-spacing: -0.04em;
+  line-height: 0.94;
+  color: var(--text-primary);
+}
+
+/* ═══════════════════════════════════════════════════════
+   AURORA GLOW LINE — top of footer / between sections
+═══════════════════════════════════════════════════════ */
+.glow-line {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  max-width: 600px;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(56, 189, 248, 0.4),
+    rgba(167, 139, 250, 0.3),
+    rgba(56, 189, 248, 0.4),
+    transparent
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   STATUS / AVAILABILITY BADGE
+═══════════════════════════════════════════════════════ */
+.availability-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 10px;
+  border-radius: 100px;
+  background: rgba(45, 212, 191, 0.07);
+  border: 1px solid rgba(45, 212, 191, 0.22);
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(45, 212, 191, 0.9);
+  letter-spacing: 0.02em;
+}
+
+.ping-dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+}
+
+.ping-dot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #2DD4BF;
+  animation: ping-pulse 1.8s ease-out infinite;
+  opacity: 0.6;
+}
+
+.ping-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #2DD4BF;
+}
+
+@keyframes ping-pulse {
+  0%   { transform: scale(1);   opacity: 0.6; }
+  100% { transform: scale(2.4); opacity: 0;   }
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLL INDICATOR
+═══════════════════════════════════════════════════════ */
+.scroll-line {
+  width: 1px;
+  height: 52px;
+  background: linear-gradient(to bottom, transparent, rgba(56,189,248,0.5), transparent);
+  animation: scroll-fade 2.2s ease-in-out infinite;
+}
+
+@keyframes scroll-fade {
+  0%, 100% { opacity: 0.3; transform: scaleY(1);    }
+  50%       { opacity: 1;   transform: scaleY(1.15); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   FOCUS GLOW (textarea / input)
+═══════════════════════════════════════════════════════ */
+.focus-glow-wrapper {
+  position: relative;
+}
+
+.focus-glow-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  box-shadow: 0 0 0 1px rgba(56,189,248,0.4), 0 0 22px rgba(56,189,248,0.1);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.focus-glow-wrapper:focus-within::after {
+  opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CUSTOM CURSOR
+   Hide the native OS cursor everywhere; CustomCursor.jsx
+   renders the two-layer dot + ring in its place.
+   We also suppress cursor: pointer on interactive elements
+   so no OS hand icon bleeds through.
+═══════════════════════════════════════════════════════ */
+
+/* Kill native cursor on everything */
+*,
+*::before,
+*::after {
+  cursor: none !important;
+}
+
+/* Ensure iframes / embeds don't show native cursor either */
+iframe,
+video {
+  cursor: none !important;
+}
+
+/* Restore text-cursor shape as a CSS variable reference
+   (not actually shown — kept for accessibility tooling) */
+input,
+textarea,
+[contenteditable] {
+  cursor: none !important;
+  caret-color: var(--accent-blue);
+}

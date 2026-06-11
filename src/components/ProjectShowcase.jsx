@@ -155,7 +155,7 @@ function TiltImageCard({ src, alt, isActive }) {
           src={src}
           alt={alt}
           onLoad={() => setIsLoaded(true)} 
-          className="w-full h-full object-contain relative z-10" // Contain fix
+          className="w-full h-full object-contain relative z-10"
           style={{
             display: 'block',
             opacity: isActive && isLoaded ? 1 : 0, 
@@ -166,35 +166,6 @@ function TiltImageCard({ src, alt, isActive }) {
             setIsLoaded(false); 
           }}
         />
-
-        {/* Placeholder - Hides cleanly once image loads */}
-        <div
-          className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-0"
-          style={{ 
-            pointerEvents: 'none',
-            opacity: isLoaded ? 0 : 1, 
-            transition: 'opacity 0.3s ease'
-          }}
-          aria-hidden="true"
-        >
-          <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center"
-            style={{
-              background: 'rgba(56,189,248,0.1)',
-              border: '1px solid rgba(56,189,248,0.25)',
-            }}
-          >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
-              stroke="rgba(56,189,248,0.7)" strokeWidth="1.6">
-              <rect x="3" y="3" width="18" height="18" rx="3"/>
-              <circle cx="8.5" cy="8.5" r="1.5"/>
-              <polyline points="21 15 16 10 5 21"/>
-            </svg>
-          </div>
-          <p style={{ fontSize: 12, color: 'rgba(160,180,218,0.4)', fontFamily: 'var(--font-body)' }}>
-            Drop screenshot in <code style={{ color: 'rgba(56,189,248,0.6)', fontSize: 11 }}>/public/{src.replace('/', '')}</code>
-          </p>
-        </div>
 
         {/* Cursor-following radial sheen */}
         <div

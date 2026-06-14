@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import {
   Github, ExternalLink,
   ShieldCheck, Mic, BarChart3,
@@ -7,7 +7,7 @@ import {
   BrainCircuit, Target,
 } from 'lucide-react';
 import ScrambleText from './ScrambleText';
-import { useScramble } from './Usescramble';
+import { useScramble } from './useScramble';
 
 /* ─────────────────────────────────────────────────────────
    Constants 
@@ -73,17 +73,15 @@ const TECH_STACK = [
 /* ─────────────────────────────────────────────────────────
    3D Tilt Image Container
 ───────────────────────────────────────────────────────── */
-function TiltImageCard({ src, alt, isActive }) {
+function TiltImageCard({ src, alt }) {
   const cardRef  = useRef(null);
   const frameRef = useRef(null);
+
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [glowPos, setGlowPos] = useState({ x: '50%', y: '50%' });
   const [hovered, setHovered] = useState(false);
-  
-  // State to track if the real image has loaded
-  const [isLoaded, setIsLoaded] = useState(false);
 
-  const MAX_TILT = 10; // degrees
+  const MAX_TILT = 10; 
 
   const handleMouseMove = useCallback((e) => {
     const card = cardRef.current;
@@ -123,12 +121,11 @@ function TiltImageCard({ src, alt, isActive }) {
       onMouseLeave={handleMouseLeave}
       className="relative w-full select-none"
       style={{
-        aspectRatio: '16 / 9', // Widescreen fix
+        aspectRatio: '16 / 9',
         perspective: '1000px',
         cursor: 'default',
       }}
     >
-      {/* Floating card with tilt */}
       <div
         className="relative w-full h-full overflow-hidden rounded-2xl"
         style={{
@@ -150,24 +147,19 @@ function TiltImageCard({ src, alt, isActive }) {
             : '0 24px 56px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04) inset',
         }}
       >
-        {/* Actual screenshot */}
-        <img
-          src={src}
-          alt={alt}
-          onLoad={() => setIsLoaded(true)} 
-          className="w-full h-full object-contain relative z-10"
-          style={{
-            display: 'block',
-            opacity: isActive && isLoaded ? 1 : 0, 
-            transition: 'opacity 0.4s ease',
-          }}
-          onError={(e) => { 
-            e.currentTarget.style.display = 'none'; 
-            setIsLoaded(false); 
-          }}
-        />
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={src}
+            src={src}
+            alt={alt}
+            initial={{ opacity: 0, filter: 'blur(8px)' }}
+            animate={{ opacity: 1, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, filter: 'blur(8px)' }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+            className="absolute inset-0 w-full h-full object-contain z-10"
+          />
+        </AnimatePresence>
 
-        {/* Cursor-following radial sheen */}
         <div
           className="absolute inset-0 pointer-events-none rounded-2xl z-20"
           style={{
@@ -177,7 +169,6 @@ function TiltImageCard({ src, alt, isActive }) {
           }}
         />
 
-        {/* Glass sheen top-left */}
         <div
           className="absolute inset-0 pointer-events-none rounded-2xl z-20"
           style={{
@@ -186,7 +177,6 @@ function TiltImageCard({ src, alt, isActive }) {
         />
       </div>
 
-      {/* Ambient drop shadow glow beneath card */}
       <div
         className="absolute -bottom-6 left-1/2 -translate-x-1/2 pointer-events-none"
         style={{
@@ -210,27 +200,34 @@ function TiltImageCard({ src, alt, isActive }) {
 function FeaturePanel({ feature, onVisible }) {
   const ref    = useRef(null);
   const inView = useInView(ref, { margin: '-38% 0px -38% 0px' });
+  
+  // FIX: Added a ref to track if this specific panel has already scrambled
+  const hasScrambled = useRef(false);
 
-  /* Scramble the feature title when panel enters view */
   const { ref: titleRef, trigger: scrambleTrigger } = useScramble({
     text:      feature.title.replace('\n', ' '),
     speed:     38,
     scrambleMs:480,
-    playOnce:  false,
+    playOnce:  true, // FIX: Changed to true
     delay:     60,
   });
 
   useEffect(() => {
     if (inView) {
       onVisible(feature.id);
-      scrambleTrigger();
+      
+      // FIX: Only trigger the scramble animation if it hasn't fired yet
+      if (!hasScrambled.current) {
+        scrambleTrigger();
+        hasScrambled.current = true;
+      }
     }
   }, [inView, feature.id, onVisible, scrambleTrigger]);
 
   return (
     <div
       ref={ref}
-      className="min-h-screen flex items-center py-28"
+      className="lg:min-h-screen flex items-center py-12 sm:py-16 lg:py-28"
     >
       <motion.div
         initial={{ opacity: 0, y: 36 }}
@@ -239,7 +236,13 @@ function FeaturePanel({ feature, onVisible }) {
         transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
         className="w-full"
       >
-        {/* Index + tag */}
+        <div className="lg:hidden mb-8">
+          <TiltImageCard
+            src={feature.image}
+            alt={feature.imageAlt}
+          />
+        </div>
+
         <div className="flex items-center gap-3 mb-7">
           <span
             className="font-mono text-xs tracking-widest"
@@ -260,15 +263,14 @@ function FeaturePanel({ feature, onVisible }) {
           </span>
         </div>
 
-        {/* Title — scramble-reveals when panel enters viewport centre */}
         <h3
           ref={titleRef}
           style={{
             fontFamily:    'var(--font-display)',
             fontWeight:    900,
-            fontSize:      'clamp(2rem, 4vw, 3.2rem)',
+            fontSize:      'clamp(1.7rem, 4vw, 3.2rem)', 
             letterSpacing: '-0.04em',
-            lineHeight:    0.92,
+            lineHeight:    0.98,
             color:         'var(--text-primary)',
             display:       'block',
             marginBottom:  20,
@@ -277,7 +279,6 @@ function FeaturePanel({ feature, onVisible }) {
           {feature.title.replace('\n', ' ')}
         </h3>
 
-        {/* Body copy */}
         <p
           className="mb-8 font-light leading-relaxed max-w-md"
           style={{
@@ -289,7 +290,6 @@ function FeaturePanel({ feature, onVisible }) {
           {feature.body}
         </p>
 
-        {/* Bullet list */}
         <ul className="flex flex-col gap-3 mb-10">
           {feature.bullets.map((b, i) => (
             <motion.li
@@ -300,7 +300,6 @@ function FeaturePanel({ feature, onVisible }) {
               transition={{ delay: 0.14 + i * 0.09, duration: 0.55, ease: EASE_OUT_EXPO }}
               className="flex items-center gap-3"
             >
-              {/* Icon box — glass */}
               <span
                 className="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0"
                 style={{
@@ -410,19 +409,17 @@ export default function ProjectShowcase() {
       style={{ background: 'transparent' }}
     >
       {/* ── Section header ── */}
-      <div className="max-w-6xl mx-auto px-6 pt-28 pb-0">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-20 sm:pt-28 pb-0">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-8%' }}
           transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
         >
-          {/* Eyebrow */}
           <div className="flex items-center gap-3 mb-6">
             <span className="eyebrow">Featured Project</span>
           </div>
 
-          {/* Title row */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-5">
             <div>
               <ScrambleText
@@ -448,7 +445,6 @@ export default function ProjectShowcase() {
               </p>
             </div>
 
-            {/* CTA buttons */}
             <div className="flex items-center gap-3 flex-wrap">
               <HeaderCTA
                 href={SOURCE_URL}
@@ -465,7 +461,6 @@ export default function ProjectShowcase() {
             </div>
           </div>
 
-          {/* Tech stack pills */}
           <div
             className="flex flex-wrap gap-2 pb-6"
             style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
@@ -492,39 +487,32 @@ export default function ProjectShowcase() {
       </div>
 
       {/* ── Sticky-scroll layout ── */}
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="flex gap-12 lg:gap-20">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="flex items-start gap-12 lg:gap-20 relative">
 
           {/* LEFT — sticky image column */}
-          <div className="hidden lg:block w-[380px] xl:w-[420px] flex-shrink-0">
-            <div className="sticky top-28 pb-24">
-              {/* Tilt image card — swaps src as user scrolls */}
-              <TiltImageCard
-                key={activeFeature.id}        
-                src={activeFeature.image}
-                alt={activeFeature.imageAlt}
-                isActive={true}
-              />
+          <div className="hidden lg:block w-[380px] xl:w-[420px] flex-shrink-0 sticky top-32 h-fit pb-12">
+            <TiltImageCard
+              src={activeFeature.image}
+              alt={activeFeature.imageAlt}
+            />
 
-              {/* Step dots */}
-              <StepDots
-                features={FEATURES}
-                activeId={activeId}
-                onSelect={setActiveId}
-              />
+            <StepDots
+              features={FEATURES}
+              activeId={activeId}
+              onSelect={setActiveId}
+            />
 
-              {/* Mini label */}
-              <motion.p
-                key={activeFeature.tag}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                className="text-center mt-3 text-[11px] uppercase tracking-widest font-semibold"
-                style={{ color: 'rgba(56,189,248,0.55)' }}
-              >
-                {activeFeature.tag}
-              </motion.p>
-            </div>
+            <motion.p
+              key={activeFeature.tag}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="text-center mt-3 text-[11px] uppercase tracking-widest font-semibold"
+              style={{ color: 'rgba(56,189,248,0.55)' }}
+            >
+              {activeFeature.tag}
+            </motion.p>
           </div>
 
           {/* RIGHT — scrolling feature panels */}
@@ -542,4 +530,4 @@ export default function ProjectShowcase() {
       </div>
     </section>
   );
-}
+} 

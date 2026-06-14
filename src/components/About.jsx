@@ -189,7 +189,11 @@ function FocusPill({ icon: Icon, label, sub, accent, delay }) {
       >
         <Icon size={17} strokeWidth={1.7} style={{ color: accent }} />
       </div>
-      <div>
+      {/* MOBILE FIX: minWidth:0 lets this flex child shrink below its
+          content size, so the sub-label wraps inside the pill instead
+          of forcing the whole pill (and its parent) wider than the
+          viewport on narrow screens. */}
+      <div style={{ minWidth: 0 }}>
         <p
           className="text-sm font-semibold tracking-tight"
           style={{ color: 'var(--text-primary)', letterSpacing: '-0.01em' }}
@@ -212,14 +216,14 @@ export default function About() {
   const bioInView = useInView(bioRef, { once: true, margin: '-8%' });
 
   return (
-    <section id="about" className="relative py-28 px-6">
+    <section id="about" className="relative py-16 sm:py-20 lg:py-28 px-4 sm:px-6">
 
       {/* Subtle secondary aurora contribution */}
       <div
-        className="pointer-events-none absolute top-0 right-0 w-[480px] h-[480px] rounded-full"
+        className="pointer-events-none absolute top-0 right-0 w-[300px] sm:w-[480px] h-[300px] sm:h-[480px] rounded-full"
         style={{
           background: 'radial-gradient(ellipse at center, rgba(167,139,250,0.06) 0%, transparent 70%)',
-          filter: 'blur(80px)',
+          filter: 'blur(60px)',
           transform: 'translate(30%, -20%)',
         }}
         aria-hidden="true"
@@ -228,7 +232,7 @@ export default function About() {
       <div className="relative max-w-6xl mx-auto">
 
         {/* ══ BIO + FOCUS — two-column ══ */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 mb-20">
 
           {/* ── Left: Bio ── */}
           <div ref={bioRef}>
@@ -293,12 +297,23 @@ export default function About() {
               style={{
                 background: 'rgba(56,189,248,0.06)',
                 border: '1px solid rgba(56,189,248,0.18)',
+                /* MOBILE FIX: badge can no longer exceed its parent's
+                   width — combined with the span's normal white-space
+                   and minWidth:0, the long "VIT Vellore · B.Tech..."
+                   string now wraps onto a second line on narrow
+                   screens instead of pushing the page wider. */
+                maxWidth: '100%',
               }}
             >
-              <GraduationCap size={15} strokeWidth={1.7} style={{ color: 'var(--accent-blue)' }} />
+              <GraduationCap size={15} strokeWidth={1.7} style={{ color: 'var(--accent-blue)', flexShrink: 0 }} />
               <span
                 className="text-sm font-medium"
-                style={{ color: 'rgba(200,214,240,0.75)', letterSpacing: '-0.01em' }}
+                style={{
+                  color: 'rgba(200,214,240,0.75)',
+                  letterSpacing: '-0.01em',
+                  minWidth: 0,
+                  whiteSpace: 'normal',
+                }}
               >
                 VIT Vellore · B.Tech Information Technology
               </span>

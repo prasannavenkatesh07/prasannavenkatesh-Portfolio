@@ -148,10 +148,12 @@ function MailtoCTA() {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
-      className="relative w-full flex items-center justify-center gap-3 overflow-hidden rounded-2xl font-semibold transition-all duration-300"
+      className="relative w-full flex items-center justify-center gap-2 sm:gap-3 overflow-hidden rounded-2xl font-semibold transition-all duration-300"
       style={{
-        padding: '18px 32px',
-        fontSize: 'clamp(0.95rem, 1.5vw, 1.05rem)',
+        /* MOBILE FIX: smaller, viewport-aware padding so the button
+           never forces the page wider on narrow screens */
+        padding: 'clamp(14px, 4vw, 18px) clamp(16px, 5vw, 32px)',
+        fontSize: 'clamp(0.85rem, 1.5vw, 1.05rem)',
         letterSpacing: '-0.01em',
         fontFamily: 'var(--font-display)',
         background: hov
@@ -175,11 +177,25 @@ function MailtoCTA() {
           background: `radial-gradient(220px circle at ${pos.x} ${pos.y}, rgba(56,189,248,0.1), transparent 65%)`,
         }}
       />
-      <Mail size={18} strokeWidth={1.8} className="relative" />
-      <span className="relative">{EMAIL}</span>
+      <Mail size={18} strokeWidth={1.8} className="relative flex-shrink-0" />
+      {/* MOBILE FIX: minWidth:0 lets this span shrink inside the flex
+          row; overflow/textOverflow truncate the long email address
+          with an ellipsis on narrow screens instead of overflowing
+          the button (and the page) horizontally. */}
+      <span
+        className="relative"
+        style={{
+          minWidth: 0,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {EMAIL}
+      </span>
       <ArrowUpRight
         size={14}
-        className="relative"
+        className="relative flex-shrink-0"
         style={{
           transform: hov ? 'translate(2px,-2px)' : 'translate(0,0)',
           transition: 'transform 0.2s ease',
@@ -215,10 +231,10 @@ export default function Footer() {
       {/* Top glow line */}
       <div className="glow-line" aria-hidden="true" />
 
-      <div className="max-w-6xl mx-auto px-6 pt-20 pb-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 pb-8 sm:pb-10">
 
         {/* ══ MAIN ROW ══ */}
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-12 mb-14">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 md:gap-12 mb-14">
 
           {/* ── Brand + tagline ── */}
           <motion.div

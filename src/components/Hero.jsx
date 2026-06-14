@@ -200,7 +200,7 @@ const Typewriter = memo(function Typewriter() {
       style={{
         fontFamily:    'var(--font-display)',
         fontWeight:    600,
-        fontSize:      'clamp(1.4rem, 3.5vw, 3rem)',
+        fontSize:      'clamp(1.15rem, 3.5vw, 3rem)', /* MOBILE FIX: lowered min from 1.4rem so longest role string ("Open to Opportunities") never wraps on 320px screens */
         lineHeight:    1.2,
         letterSpacing: '-0.03em',
         color:         'rgba(200,214,240,0.55)',
@@ -354,6 +354,8 @@ function InteractiveName({ text, delay = 0, style = {} }) {
           flexWrap:   'nowrap',
           lineHeight: 0.88,
           perspective: '800px',
+          /* FIX: Added safety padding so the trailing edge of wide fonts ('h') isn't clipped by line-mask */
+          paddingRight: '0.2em',
           ...style,
         }}
         aria-label={text}
@@ -365,7 +367,8 @@ function InteractiveName({ text, delay = 0, style = {} }) {
             onMouseEnter={() => triggerRipple(i)}
             style={{
               display:      'inline-block',
-              fontSize:     'clamp(3.6rem, 9.2vw, 9rem)',
+              /* FIX: Adjusted vw and max-rem so "Venkatesh" scales cleanly within mobile and desktop bounds */
+              fontSize:     'clamp(1.8rem, 9vw, 7.5rem)',
               fontFamily:   'var(--font-display)',
               fontWeight:   800,
               letterSpacing: '-0.04em',
@@ -569,7 +572,7 @@ export default function Hero({ loaderDone = true }) {
   return (
     <section
       id="home"
-      className="relative flex flex-col justify-center min-h-screen px-6 overflow-hidden"
+      className="relative flex flex-col justify-center min-h-screen px-4 sm:px-6 overflow-hidden"
     >
       <style>{`
         @keyframes cursorBlink {
@@ -626,7 +629,7 @@ export default function Hero({ loaderDone = true }) {
         {/* Interactive name — letters bounce on hover */}
         <div style={{ perspective: '1000px' }}>
           <InteractiveName text="Prasanna"   delay={loaderDone ? 0.22 : 99} />
-          <InteractiveName text="Venkatesh." delay={loaderDone ? 0.38 : 99} />
+          <InteractiveName text="Venkatesh" delay={loaderDone ? 0.38 : 99} />
         </div>
 
         {/* Typewriter role — height-locked so empty string never collapses layout */}
@@ -636,7 +639,7 @@ export default function Hero({ loaderDone = true }) {
             animate={loaderDone ? { y: '0%', opacity: 1 } : { y: '115%', opacity: 0 }}
             transition={{ duration: 0.88, ease: EASE_EXPO, delay: 0.55 }}
             style={{
-              minHeight:  'calc(clamp(1.4rem, 3.5vw, 3rem) * 1.3)',
+              minHeight:  'calc(clamp(1.15rem, 3.5vw, 3rem) * 1.3)', /* MOBILE FIX: matches Typewriter's new min font size */
               display:    'flex',
               alignItems: 'center',
             }}

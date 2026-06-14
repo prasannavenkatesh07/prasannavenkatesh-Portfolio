@@ -42,6 +42,14 @@ export default function CustomCursor() {
   const [hovering, setHovering] = useState(false);
   const [clicking, setClicking] = useState(false);
   const [visible,  setVisible ] = useState(false);
+  /*
+    TOUCH FIX:
+    null  = not yet determined (avoids SSR mismatch / flash)
+    true  = touch/coarse-pointer device → render nothing,
+            never call document.documentElement.style.cursor
+    false = mouse/trackpad → proceed as normal
+  */
+  const [isTouch, setIsTouch] = useState(null);
 
   /* ── Lerp animation loop ── */
   const animate = useCallback(() => {
@@ -63,8 +71,24 @@ export default function CustomCursor() {
   }, []);
 
   useEffect(() => {
-    /* Hide native cursor globally */
-    document.documentElement.style.cursor = 'none';
+    /*
+      Detect touch/coarse-pointer devices. `pointer: coarse`
+      catches phones and tablets; `ontouchstart` is a fallback
+      for older browsers. Devices with a mouse AND touch
+      (e.g. some laptops) report `pointer: fine` as primary,
+      so they correctly get the custom cursor.
+    */
+    const touchDevice =
+      window.matchMedia('(pointer: coarse)').matches ||
+      ('ontouchstart' in window && navigator.maxTouchPoints > 0);
+
+    setIsTouch(touchDevice);
+
+    /* On touch devices: do nothing — leave native behaviour untouched */
+    if (touchDevice) return;
+
+    /* Mark <html> so the scoped CSS in index.css activates */
+    document.documentElement.classList.add('custom-cursor-active');
 
     const onMove = (e) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
@@ -96,7 +120,7 @@ export default function CustomCursor() {
     rafRef.current = requestAnimationFrame(animate);
 
     return () => {
-      document.documentElement.style.cursor = '';
+      document.documentElement.classList.remove('custom-cursor-active');
       document.removeEventListener('mousemove',  onMove);
       document.removeEventListener('mouseover',  onEnter);
       document.removeEventListener('mouseout',   onLeave);
@@ -122,6 +146,7 @@ export default function CustomCursor() {
   const dotScale    = clicking ? 0.6 : 1;
 
   if (typeof window === 'undefined') return null; // SSR guard
+  if (isTouch === null || isTouch === true) return null; // touch device or not yet detected
 
   return (
     <>

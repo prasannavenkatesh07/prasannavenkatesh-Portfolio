@@ -113,6 +113,8 @@ function LetterExpand({ initial, rest, expanded, delay = 0, fontSize }) {
         style={{
           display:  'flex',
           overflow: 'hidden',
+          /* FIX: Safety padding so sweeping tails (like 'h' or 'a') are not clipped */
+          paddingRight: '0.2em',
         }}
       >
         {rest.split('').map((char, i) => (
@@ -277,7 +279,11 @@ export default function PageLoader({ onComplete }) {
 
   if (unmounted) return null
 
-  const fontSize = 'clamp(5rem, 14vw, 11rem)'
+  /*
+    FIX: Dialed down from 13.5vw so 9-letter "Venkatesh"
+    fits easily within the 320px viewport width without overflowing.
+  */
+  const fontSize = 'clamp(1.8rem, 9.5vw, 8.5rem)'
 
   return (
     <>
@@ -335,6 +341,9 @@ export default function PageLoader({ onComplete }) {
             alignItems:     'flex-start',
             gap:            'clamp(4px, 1vw, 12px)',
             position:       'relative',
+            maxWidth:       '92vw',
+            padding:        '0 4vw',
+            boxSizing:      'border-box',
           }}
         >
           {/* ── Prasanna ── */}
@@ -403,11 +412,13 @@ export default function PageLoader({ onComplete }) {
             style={{
               fontFamily:    'var(--font-body)',
               fontWeight:    300,
-              fontSize:      'clamp(0.85rem, 1.4vw, 1.05rem)',
+              fontSize:      'clamp(0.7rem, 1.4vw, 1.05rem)',
               color:         'var(--text-muted)',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               marginTop:     'clamp(8px, 2vw, 18px)',
+              whiteSpace:    'normal',
+              maxWidth:      '100%',
             }}
           >
             Frontend Developer · VIT Vellore

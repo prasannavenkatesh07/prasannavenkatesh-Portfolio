@@ -103,7 +103,7 @@ export default function Navbar() {
             : '1px solid transparent',
         }}
       >
-        <nav className="max-w-6xl mx-auto px-6 flex items-center justify-between">
+        <nav className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between">
 
           {/* Logo */}
           <a
@@ -212,7 +212,7 @@ export default function Navbar() {
               borderBottom:   '1px solid rgba(255,255,255,0.07)',
             }}
           >
-            <ul className="flex flex-col px-6 py-5 gap-1 list-none">
+            <ul className="flex flex-col px-4 sm:px-6 py-5 gap-1 list-none">
               {NAV_LINKS.map((link) => (
                 <li key={link.label}>
                   <a

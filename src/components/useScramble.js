@@ -42,7 +42,7 @@ export function useScramble({
   playOnce = true,
   delay = 0,
 } = {}) {
-  const outputRef = useRef(null); // the DOM element we write to
+  const outputRef = useRef(null);
   const rafId = useRef(null);
   const hasPlayed = useRef(false);
   const isRunning = useRef(false);

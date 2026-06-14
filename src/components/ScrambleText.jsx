@@ -1,4 +1,4 @@
-import { useScramble } from './Usescramble'
+import { useScramble } from './useScramble'
 
 /* ─────────────────────────────────────────────────────────
    ScrambleText

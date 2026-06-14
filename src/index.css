@@ -58,6 +58,9 @@ section#home canvas {
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  /* FIX: Changed from hidden to clip so position: sticky works perfectly */
+  overflow-x: clip;
+  max-width: 100vw;
 }
 
 body {
@@ -68,7 +71,8 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  /* FIX: Changed from hidden to clip */
+  overflow-x: clip;
   /* Grain texture overlay */
   position: relative;
 }
@@ -182,6 +186,26 @@ textarea:focus, input:focus  { outline: none; }
   33%  { transform: translate(40px,  -50px) scale(1.12); opacity: 0.85;}
   66%  { transform: translate(-30px, -20px) scale(0.98); opacity: 0.7; }
   100% { transform: translate(20px,  -60px) scale(1.04); opacity: 0.8; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   MOBILE OVERRIDES
+   Aurora orbs are oversized for small viewports — shrink
+   them so the blur radius doesn't dominate the screen and
+   so the .aurora-container (already overflow:hidden) never
+   has to clip extreme sizes on low-powered GPUs.
+   Magnetic buttons get tighter padding so two CTAs fit on
+   one row on narrow phones without wrapping awkwardly.
+═══════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .aurora-orb-1 { width: 380px; height: 380px; filter: blur(60px); }
+  .aurora-orb-2 { width: 420px; height: 360px; filter: blur(60px); }
+  .aurora-orb-3 { width: 340px; height: 340px; filter: blur(55px); }
+
+  .btn-magnetic {
+    padding: 12px 22px;
+    font-size: 0.875rem;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -534,30 +558,32 @@ textarea:focus, input:focus  { outline: none; }
 
 /* ═══════════════════════════════════════════════════════
    CUSTOM CURSOR
-   Hide the native OS cursor everywhere; CustomCursor.jsx
-   renders the two-layer dot + ring in its place.
-   We also suppress cursor: pointer on interactive elements
-   so no OS hand icon bleeds through.
+   TOUCH FIX: these rules now ONLY apply when CustomCursor.jsx
+   has detected a non-touch (mouse/trackpad) device and added
+   `custom-cursor-active` to <html>. On phones/tablets the
+   native cursor/tap behaviour is left completely untouched.
 ═══════════════════════════════════════════════════════ */
 
-/* Kill native cursor on everything */
-*,
-*::before,
-*::after {
+html.custom-cursor-active *,
+html.custom-cursor-active *::before,
+html.custom-cursor-active *::after {
   cursor: none !important;
 }
 
-/* Ensure iframes / embeds don't show native cursor either */
-iframe,
-video {
+html.custom-cursor-active iframe,
+html.custom-cursor-active video {
   cursor: none !important;
 }
 
-/* Restore text-cursor shape as a CSS variable reference
-   (not actually shown — kept for accessibility tooling) */
+html.custom-cursor-active input,
+html.custom-cursor-active textarea,
+html.custom-cursor-active [contenteditable] {
+  cursor: none !important;
+}
+
+/* Caret colour is independent of cursor visibility — keep on all devices */
 input,
 textarea,
 [contenteditable] {
-  cursor: none !important;
   caret-color: var(--accent-blue);
 }

@@ -216,7 +216,7 @@ export default function Contact() {
       <section
         id="contact"
         ref={sectionRef}
-        className="relative py-28 px-6"
+        className="relative py-16 sm:py-20 lg:py-28 px-4 sm:px-6"
       >
         {/* Ambient glow centred on section */}
         <div
@@ -255,13 +255,12 @@ export default function Contact() {
               variants={cardVariant(0.05)}
               initial="hidden"
               animate={inView ? 'visible' : 'hidden'}
-              className="relative flex flex-col justify-between rounded-2xl p-8 overflow-hidden"
+              className="relative flex flex-col justify-between rounded-2xl p-5 sm:p-8 overflow-hidden min-h-[400px] sm:min-h-[440px]"
               style={{
                 background: 'rgba(10, 15, 28, 0.85)',
                 border: '1px solid rgba(255,255,255,0.09)',
                 backdropFilter: 'blur(16px)',
                 WebkitBackdropFilter: 'blur(16px)',
-                minHeight: 440,
                 boxShadow: '0 24px 56px rgba(0,0,0,0.3)',
               }}
             >
@@ -313,8 +312,9 @@ export default function Contact() {
                 </p>
               </div>
 
-              {/* Bottom info boxes */}
-              <div className="flex gap-3 mt-10">
+              {/* Bottom info boxes — stack on very small screens so the
+                  truncated email in "Primary Channel" has room to breathe */}
+              <div className="flex flex-col sm:flex-row gap-3 mt-10">
                 <InfoBox
                   icon={Clock}
                   label="Response"
@@ -343,13 +343,12 @@ export default function Contact() {
               variants={cardVariant(0.14)}
               initial="hidden"
               animate={inView ? 'visible' : 'hidden'}
-              className="relative flex flex-col rounded-2xl p-8 overflow-hidden"
+              className="relative flex flex-col rounded-2xl p-5 sm:p-8 overflow-hidden min-h-[400px] sm:min-h-[440px]"
               style={{
                 background: 'rgba(10, 15, 28, 0.85)',
                 border: '1px solid rgba(255,255,255,0.09)',
                 backdropFilter: 'blur(16px)',
                 WebkitBackdropFilter: 'blur(16px)',
-                minHeight: 440,
                 boxShadow: '0 24px 56px rgba(0,0,0,0.3)',
               }}
             >
